@@ -3,57 +3,64 @@ var util = require('util');
 var ObjectId = require('mongodb').ObjectID;
 
 module.exports = {
-  getAnchors: getAnchors,
-  setAnchors: setAnchors
+  getRooms: getRooms,
+  setRoom: setRoom
 };
 
 var MongoClient = require('mongodb').MongoClient;
 var url = "mongodb://localhost:27017/";
 
-function getAnchors(req, res) {
+function getRooms(req, res) {
 
   var building_id = req.swagger.params.idBuilding.value;
   console.log(building_id);
 
-  MongoClient.connect(url, function(err, db) {
-    if (err) throw err;
-    console.log("Connected to Database !");
+  MongoClient.connect(url, function (err, db) {
+
+    if(err) throw err;
     var dbo = db.db("cyberholocampus");
+    console.log("Connected to Database !");
 
-    dbo.collection("buildings").findOne({"_id" : new ObjectId(building_id)}, function(err, result) {
-      if (err) throw err;
-      console.log(result.anchors);
+    dbo.collection("buildings").findOne({"_id" : new ObjectId(building_id)}, function(err, result){
 
-      // this sends back a JSON response which is a single string
-      res.json(result.anchors);
+      if(err) throw err;
+      console.log(result);
+
+      res.json(result.rooms || []);
 
     });
 
-    db.close();
   });
 
 }
 
-function setAnchors(req, res) {
+function setRoom(req, res) {
 
   var building_id = req.swagger.params.idBuilding.value;
-  var content = req.swagger.params.data.value;
-  console.log(content);
+  var room_id = req.swagger.params.idRoom.value;
+  var data = req.swagger.params.data.value;
+
 
   MongoClient.connect(url, function(err, db) {
     if (err) throw err;
-    console.log("Connected to Database !");
     var dbo = db.db("cyberholocampus");
-
+    console.log("Connected to Database !");
+    /*
     dbo.collection("buildings").updateOne(
       {"_id" : new ObjectId(building_id)},
-      {$set: {"anchors" : content.data}},
+      {$set: {
+        room.room_id : {
+          data
+        }
+      }}
       function(err, result) {
         if (err) throw err;
+        console.log(result.anchors);
 
         res.status(200);
-        console.log(res.statusCode);
-    });
+      }
+    );
+    */
 
     db.close();
   });
